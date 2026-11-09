@@ -1,0 +1,269 @@
+{
+  //definisce come lAPIGateway instrada le richieste verso gli mss, e contiene anche funzionalita di caching,resielnza,retry e rate limiting.
+
+  "Routes": [ //regole per ogni endpoint
+
+    {
+      "UpstreamPathTemplate": "/gateway/Orders/", //upstream è l'indirizzo chiamato dal frontend
+      "DownstreamPathTemplate": "/api/Orders", //downstream è l'indirizzo interno del ms al quale ocelot inotra la req
+      "DownstreamHostAndPorts": [ //dove si trova il servizio di destinazione
+        {
+          "Host": "ordersmicroservice.api",
+          "Port": 8080
+        }
+      ],
+      // http://localhost:5000/gateway/Orders to http://ordersmicroservice.api:8080/api/Orders 
+      "UpstreamHttpMethod": [ //quali methodi http possono utilizzare questa route
+        "Get",
+        "Post",
+        "Options" //richieste preliminare CORS, quando necessarie
+      ],
+      "UpstreamScheme": "http", //schema previsto per la req in ingresso
+
+      "FileCacheOptions": { //abilita la cache delle risposte tramite il sistema di caching di Ocelot
+        "TtlSeconds": 30, //la risposta in cache puo essere riutilizzate per 30sec
+        "Region": "orders" //regione logica della cache, utile per organizzare le voci memorizzate
+      }
+    },
+
+
+
+    {
+      "UpstreamPathTemplate": "/gateway/Orders/search/orderid/{orderID}/",
+      "DownstreamPathTemplate": "/api/Orders/search/orderid/{orderID}",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "ordersmicroservice.api",
+          "Port": 8080
+        }
+      ],
+      "UpstreamHttpMethod": [
+        "Get"
+      ],
+      "UpstreamScheme": "http"
+    },
+
+
+
+    {
+      "UpstreamPathTemplate": "/gateway/Orders/search/productid/{productID}/",
+      "DownstreamPathTemplate": "/api/Orders/search/productid/{productID}",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "ordersmicroservice.api",
+          "Port": 8080
+        }
+      ],
+      "UpstreamHttpMethod": [
+        "Get"
+      ],
+      "UpstreamScheme": "http"
+    },
+
+
+
+    {
+      "UpstreamPathTemplate": "/gateway/Orders/search/orderDate/{orderDate}/",
+      "DownstreamPathTemplate": "/api/Orders/search/orderDate/{orderDate}",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "ordersmicroservice.api",
+          "Port": 8080
+        }
+      ],
+      "UpstreamHttpMethod": [
+        "Get"
+      ],
+      "UpstreamScheme": "http"
+    },
+
+
+
+    {
+      "UpstreamPathTemplate": "/gateway/Orders/search/userid/{userID}/",
+      "DownstreamPathTemplate": "/api/Orders/search/userid/{userID}",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "ordersmicroservice.api",
+          "Port": 8080
+        }
+      ],
+      "UpstreamHttpMethod": [
+        "Get"
+      ],
+      "UpstreamScheme": "http"
+    },
+
+
+
+    {
+      "UpstreamPathTemplate": "/gateway/Orders/{orderID}/",
+      "DownstreamPathTemplate": "/api/Orders/{orderID}",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "ordersmicroservice.api",
+          "Port": 8080
+        }
+      ],
+      "UpstreamHttpMethod": [
+        "Put",
+        "Delete",
+        "Options"
+      ],
+      "UpstreamScheme": "http"
+    },
+
+
+
+    {
+      "UpstreamPathTemplate": "/gateway/Products/",
+      "DownstreamPathTemplate": "/api/Products",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "products-microservice",
+          "Port": 8080
+        }
+      ],
+      "UpstreamHttpMethod": [
+        "Get",
+        "Post",
+        "Put",
+        "Options"
+      ],
+      "UpstreamScheme": "http",
+      "QoSOptions": { //
+        "ExceptionsAllowedBeforeBreaking": 3, //definisce la soglia di errori gestiti prima che il circuit breaker si apra
+        "DurationOfBreak": 100000,  //millisendi, +- 1min40sec
+        "TimeoutValue": 5000  //5sec
+      },
+      "RetryOptions": {
+        "RetryCount": 3,  //3 tentativi (aggiuntivi alla prima chiamata)
+        "RetryOnServerError": true  //abilita i retry per gli errori server previsti dalla funzionalità supportata
+      },
+      "RateLimitOptions": { //protegge il gateway da un numero eccessivo di req
+        "Limit": 3, //max 3 req nella finestra milliseconds settata
+        "Period": "1m", //
+        "HttpStatusCode": 429, //status code return quando il limite viene superato
+        "EnableRateLimiting": true, //abilita il rate limiting
+        "PeriodTimespan": 30, //opzione legacy x old versions
+        "ClientWhitelist": [ //esclusi da questo limite 
+          "Client1",
+          "Client2"
+        ],
+        "ClientIdHeader": "Client-Id" //header indicato per identificare il client (e.g. se una req nel header ha Client-Id: Client3 allora questo client sra aescluso xk dentro la white list)
+      }
+    },
+
+
+
+    {
+      "UpstreamPathTemplate": "/gateway/Products/{productID}/",
+      "DownstreamPathTemplate": "/api/Products/{productID}",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "products-microservice",
+          "Port": 8080
+        }
+      ],
+      "UpstreamHttpMethod": [
+        "Delete",
+        "Options"
+      ],
+      "UpstreamScheme": "http"
+    },
+
+
+
+    {
+      "UpstreamPathTemplate": "/gateway/Products/search/product-id/{productID}/",
+      "DownstreamPathTemplate": "/api/Products/search/product-id/{productID}",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "products-microservice",
+          "Port": 8080
+        }
+      ],
+      "UpstreamHttpMethod": [
+        "Get"
+      ],
+      "UpstreamScheme": "http"
+    },
+
+
+
+    {
+      "UpstreamPathTemplate": "/gateway/Products/search/{searchString}/",
+      "DownstreamPathTemplate": "/api/Products/search/{searchString}",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "products-microservice",
+          "Port": 8080
+        }
+      ],
+      "UpstreamHttpMethod": [
+        "Get"
+      ],
+      "UpstreamScheme": "http"
+    },
+
+
+
+    {
+      "UpstreamPathTemplate": "/gateway/Users/Auth/register/",
+      "DownstreamPathTemplate": "/api/Auth/register",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "users-microservice",
+          "Port": 9090
+        }
+      ],
+      "UpstreamHttpMethod": [
+        "Post",
+        "Options"
+      ],
+      "UpstreamScheme": "http"
+    },
+
+
+
+    {
+      "UpstreamPathTemplate": "/gateway/Users/Auth/login/",
+      "DownstreamPathTemplate": "/api/Auth/login",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "users-microservice",
+          "Port": 9090
+        }
+      ],
+      "UpstreamHttpMethod": [
+        "Post",
+        "Options"
+      ],
+      "UpstreamScheme": "http"
+    },
+
+
+
+    {
+      "UpstreamPathTemplate": "/gateway/Users/{userID}/",
+      "DownstreamPathTemplate": "/api/users/{userID}",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "users-microservice",
+          "Port": 9090
+        }
+      ],
+      "UpstreamHttpMethod": [
+        "Get"
+      ],
+      "UpstreamScheme": "http"
+    }
+
+
+  ],
+  "GlobalConfiguration": { //configurazione generale del Gateway
+    "BaseUrl": "http://localhost:4000" //indirizzo di base con cui il Gateway è esposto
+  }
+
+
+}

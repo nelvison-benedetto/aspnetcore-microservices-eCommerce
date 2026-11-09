@@ -1,0 +1,15 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".dockerignore" />
+    <File Path="CLAUDE.md" />
+    <File Path="docker-compose.override.yml" />
+    <File Path="docker-compose.yml" />
+    <File Path="launchSettings.json" />
+    <File Path="MS_Advanced.md" />
+    <File Path="MS_Architercure.md" />
+  </Folder>
+  <Project Path="ApiGateway/ApiGateway.csproj" Id="efb51dfd-66e9-497f-962d-133e85fdba27" />
+  <Project Path="BusinessLogicLayer/BusinessLogicLayer.csproj" />
+  <Project Path="DataAccessLayer/DataAccessLayer.csproj" />
+  <Project Path="OrdersMicroservice.API/OrdersMicroservice.API.csproj" />
+</Solution>

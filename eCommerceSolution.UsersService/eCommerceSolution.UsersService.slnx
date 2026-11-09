@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".dockerignore" />
+    <File Path=".gitattributes" />
+    <File Path=".gitignore" />
+  </Folder>
+  <Project Path="eCommerce.API/eCommerce.API.csproj" />
+  <Project Path="eCommerce.Core/eCommerce.Core.csproj" />
+  <Project Path="eCommerce.Infrastructure/eCommerce.Infrastructure.csproj" />
+</Solution>
